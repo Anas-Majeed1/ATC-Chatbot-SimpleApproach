@@ -61,6 +61,11 @@ cd src
 streamlit run app.py
 ```
 
+To run without any warning: 
+```
+streamlit run app.py --server.fileWatcherType=none
+```
+
 ## 📁 Project Structure
 
 ```

@@ -9,18 +9,34 @@ def initialize_session_state():
         st.session_state.messages = []
 
 def format_source_documents(source_docs):
-    """Format source documents into a readable string"""
-    if not source_docs:
+    """Format source documents into a clickable link"""
+    if not source_docs or len(source_docs) == 0:
         return ""
     
-    sources = []
-    for doc in source_docs:
-        if hasattr(doc, 'metadata') and 'source' in doc.metadata:
-            # Extract only the filename without the path
-            filename = doc.metadata['source'].split('\\')[-1]
-            sources.append(filename)
+    # Get the most relevant source (first one)
+    doc = source_docs[0]
     
-    return ", ".join(set(sources))  # Remove duplicates
+    if hasattr(doc, 'metadata') and 'source' in doc.metadata:
+        # Extract only the filename without the path
+        filename = doc.metadata['source'].split('\\')[-1]
+        # Create a relative path for the link
+        file_path = f"data/{filename}"
+        return f'Read More Here: <a href="{file_path}" target="_blank"> {filename}</a>'
+    
+    return ""
+
+def should_show_sources(response):
+    """
+    Determine if sources should be shown based on the response content
+    """
+    # Don't show sources for emails or greetings
+    if any(email in response.lower() for email in [
+        "@atcmarket.com",
+        "hey!", "hi!", "hello",
+        "morning", "afternoon", "evening", "night"
+    ]):
+        return False
+    return True
 
 def main():
     """Main function to run the Streamlit web interface"""
@@ -37,9 +53,11 @@ def main():
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            if message["role"] == "assistant" and "sources" in message:
-                st.markdown(f"<span style='color: #2E86C1'><i>Sources: {message['sources']}</i></span>", 
-                          unsafe_allow_html=True)
+            if (message["role"] == "assistant" and 
+                "sources" in message and 
+                message["sources"] and 
+                should_show_sources(message["content"])):
+                st.markdown(message["sources"], unsafe_allow_html=True)
 
     # Chat input
     if prompt := st.chat_input("How can I help you today?"):
@@ -57,15 +75,14 @@ def main():
                     sources = format_source_documents(result.get("source_documents", []))
                     
                     st.markdown(response)
-                    if sources:
-                        st.markdown(f"<span style='color: #2E86C1'><i>Sources: {sources}</i></span>", 
-                                  unsafe_allow_html=True)
+                    if sources and should_show_sources(response):
+                        st.markdown(sources, unsafe_allow_html=True)
                     
                     # Save message with sources
                     st.session_state.messages.append({
                         "role": "assistant", 
                         "content": response,
-                        "sources": sources
+                        "sources": sources if should_show_sources(response) else ""
                     })
                 except Exception as e:
                     error_message = f"An error occurred. Please try again or contact support. Error: {str(e)}"

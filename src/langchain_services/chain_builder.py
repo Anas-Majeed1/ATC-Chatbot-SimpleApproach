@@ -46,7 +46,7 @@ def setup_chatbot():
         k=2
     )
     
-    return ConversationalRetrievalChain.from_llm(
+    chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vector_store.as_retriever(search_kwargs={"k": 2}),
         memory=memory,
@@ -55,3 +55,5 @@ def setup_chatbot():
         return_source_documents=True,
         verbose=True
     )
+    
+    return chain

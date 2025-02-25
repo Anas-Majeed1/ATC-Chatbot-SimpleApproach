@@ -31,11 +31,10 @@ def should_show_sources(response):
     """
     greeting_patterns = [
         "@atcmarket.com",
-        "hey!", "hi!", "hello!", 
-        "bye", "goodbye", "thanks", "thank you!",
-        "morning", "afternoon", "evening", "night",
-        "how can i assist you",
-        "customer assistant"
+        "hey", "hi", "hello", 
+        "bye", "goodbye", "thanks", "thank you",
+        "good morning", "good afternoon", "good evening", "good night",
+        "how can i assist you", "customer assistant at atcmarket"
     ]
     
     response_lower = response.lower()

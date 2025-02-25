@@ -29,14 +29,17 @@ def should_show_sources(response):
     """
     Determine if sources should be shown based on the response content
     """
-    # Don't show sources for emails or greetings
-    if any(email in response.lower() for email in [
+    greeting_patterns = [
         "@atcmarket.com",
-        "hey!", "hi!", "hello",
-        "morning", "afternoon", "evening", "night"
-    ]):
-        return False
-    return True
+        "hey!", "hi!", "hello!", 
+        "bye", "goodbye", "thanks", "thank you!",
+        "morning", "afternoon", "evening", "night",
+        "how can i assist you",
+        "customer assistant"
+    ]
+    
+    response_lower = response.lower()
+    return not any(pattern in response_lower for pattern in greeting_patterns)
 
 def main():
     """Main function to run the Streamlit web interface"""

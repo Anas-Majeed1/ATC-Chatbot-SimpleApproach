@@ -21,7 +21,8 @@ def format_source_documents(source_docs):
     if hasattr(doc, 'metadata') and 'source' in doc.metadata:
         # Extract only the filename without the path
         full_path = doc.metadata['source']
-        filename = full_path.split('\\\\')[-1]
+        filename = full_path.split('\\')[-1]
+        filename = filename.split('/')[-1]
         
         # Check if the filename is in our mapping
         if filename in file_url_mapping:
